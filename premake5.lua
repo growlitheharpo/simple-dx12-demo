@@ -20,19 +20,41 @@ workspace "dx12-tutorual"
 	architecture "x86_64"
 	configurations { "Debug", "Release" }
 
+	defines {
+		"IN_USE=2",
+		"NOT_IN_USE=4",
+	}
+
+	defines {
+		"DEBUGGING=NOT_IN_USE",
+		"DEVELOPMENT=NOT_IN_USE",
+		"RELEASE=NOT_IN_USE",
+	}
+
 	filter { "configurations:Debug" }
-		defines { "DEBUG", "_DEBUG" }
+		removedefines { "DEBUGGING*", "DEVELOPMENT*" }
+		defines { 
+			"DEBUG", 
+			"_DEBUG",
+			"DEBUGGING=IN_USE",
+			"DEVELOPMENT=IN_USE",
+		}
 		symbols "On"
 
 	filter { "configurations:Release" }
-		defines { "NDEBUG" }
+		removedefines { "RELEASE*" }
+		defines { 
+			"NDEBUG",
+			"RELEASE=IN_USE"
+		}
 		optimize "On"
 
 	filter {"system:windows", "action:vs*"}
 		systemversion "latest"
 		links {
-			"msvcrtd.lib",
-			"vcruntimed.lib",
+			"d3d12.lib",
+			"dxgi.lib",
+			"dxguid.lib",
 		}
 
 	filter {}
@@ -43,6 +65,9 @@ workspace "dx12-tutorual"
 
 	defines {
 		"_ITERATOR_DEBUG_LEVEL=0",
+		"NOMINMAX",
+		"WIN32_LEAN_AND_MEAN",
+		"VC_EXTRALEAN"
 	}
 
 	targetdir ("build/bin/%{prj.name}/%{cfg.longname}")
@@ -53,4 +78,9 @@ project "dx12-tutorial"
 	kind "WindowedApp"
 	files {
 		"src/**",
+	}
+
+	includedirs {
+		"external/microsoft",
+		"src/"
 	}
