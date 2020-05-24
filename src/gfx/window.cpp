@@ -60,9 +60,16 @@ bool Window::Create(WndProc wndProc, HINSTANCE instance, uint32 width, uint32 he
 		instance, 
 		nullptr);
 
+	DWORD x = GetLastError();
+
 	if (!hWnd)
 		return false;
 
 	m_window = hWnd;
 	return true;
+}
+
+void Window::Show()
+{
+	::ShowWindow(m_window, SW_SHOW);
 }

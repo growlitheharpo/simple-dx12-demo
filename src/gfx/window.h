@@ -23,4 +23,6 @@ public:
 	{
 		return m_window;
 	}
+
+	void Show();
 };

@@ -1,20 +1,11 @@
 #pragma once
 
+#include "gfx/command_type.h"
+
 #include <wrl.h>
 
 struct ID3D12CommandQueue;
 class Device;
-
-enum class CommandQueueType : int
-{
-	Direct,
-	Bundle,
-	Compute,
-	Copy,
-	VideoDecode,
-	VideoProcess,
-	VideoEncode,
-};
 
 class CommandQueue
 {

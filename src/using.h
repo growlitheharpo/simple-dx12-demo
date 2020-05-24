@@ -8,3 +8,4 @@
 
 // Add features here
 
+#define DX12_DEBUG_LAYER DEBUGGING
