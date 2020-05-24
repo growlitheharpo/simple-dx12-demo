@@ -1,9 +1,13 @@
 #include "command_queue.h"
 
+#include "gfx/command_list.h"
 #include "gfx/device.h"
 #include "gfx/util.h"
 
 #include <d3d12.h>
+
+#include <vector>
+#include <algorithm>
 
 DECLARE_EQUIVALENT_ENUM(CommandQueueType, D3D12_COMMAND_LIST_TYPE);
 TEST_EQUIVALENT_ENUM(CommandQueueType::Direct, D3D12_COMMAND_LIST_TYPE_DIRECT);
@@ -28,4 +32,14 @@ bool CommandQueue::Create(const Device& d, CommandQueueType type)
 		return false;
 
 	return true;
+}
+
+void CommandQueue::Execute(std::initializer_list<CommandList*> wrappedLists)
+{
+	std::vector<ID3D12CommandList*> lists;
+	std::transform(wrappedLists.begin(), wrappedLists.end(), std::back_inserter(lists), [](CommandList* l) {
+		return l->GetRawCommandListHandle().Get();
+	});
+
+	m_commandQueue->ExecuteCommandLists(uint32(lists.size()), lists.data());
 }

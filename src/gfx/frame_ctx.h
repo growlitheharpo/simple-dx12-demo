@@ -1,6 +1,8 @@
 #pragma once
 
 #include "gfx/command_type.h"
+#include "gfx/resource.h"
+#include "gfx/util.h"
 
 #include "types.h"
 
@@ -10,7 +12,6 @@ class Device;
 class SwapChain;
 class DescriptorHeap;
 
-struct ID3D12Resource;
 struct ID3D12CommandAllocator;
 
 class FrameCtx
@@ -20,13 +21,21 @@ public:
 	using ComPtr = Microsoft::WRL::ComPtr<T>;
 
 private:
-	ComPtr<ID3D12Resource> m_backBuffer;
+	Resource m_backBuffer;
 	ComPtr<ID3D12CommandAllocator> m_commandAllocator;
 	uint64 m_fenceValue = 0;
+
+	ALLOW_GFX_ACCESS();
+	ComPtr<ID3D12CommandAllocator> GetRawCommandAllocatorHandle() const
+	{
+		return m_commandAllocator;
+	}
 
 public:
 	bool Create(size_t index, const Device& d, const SwapChain& sc, const DescriptorHeap& h, CommandQueueType allocatorType);
 	void Destroy();
+
+	void ResetCommandAllocator();
 
 	void SetFenceValue(uint64 v)
 	{
@@ -38,13 +47,13 @@ public:
 		return m_fenceValue;
 	}
 
-	ComPtr<ID3D12Resource> GetRawBackBufferHandle() const
+	Resource& GetBackBuffer()
 	{
 		return m_backBuffer;
 	}
 
-	ComPtr<ID3D12CommandAllocator> GetRawCommandAllocatorHandle() const
+	const Resource& GetBackBuffer() const
 	{
-		return m_commandAllocator;
+		return m_backBuffer;
 	}
 };

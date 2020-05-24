@@ -11,6 +11,23 @@ function get_output_location(prj_name)
 	return get_root_location() .. "build/bin/" .. prj_name .. "/%{cfg.longname}/"
 end
 
+function include_mathfu(useSysInclude)
+	if useSysInclude then
+		sysincludedirs {
+			"external/google-mathfu/include",
+			"external/google-mathfu/dependencies/vectorial/include"
+		}
+	else
+		includedirs {
+			"external/google-mathfu/include",
+			"external/google-mathfu/dependencies/vectorial/include"
+		}
+	end
+	defines {
+		"MATHFU_COMPILE_WITH_SIMD=1"
+	}
+end
+
 workspace "dx12-tutorual"
 	location "build/"
 	language "C++"
@@ -80,7 +97,20 @@ project "dx12-tutorial"
 		"src/**",
 	}
 
+	include_mathfu()
 	includedirs {
 		"external/microsoft",
-		"src/"
+		"src/",
 	}
+
+
+group "external"
+project "google-mathfu"
+	set_location()
+	kind "None"
+	include_mathfu(true)
+	files {
+		"external/google-mathfu/include/**",
+	}
+
+group "*"

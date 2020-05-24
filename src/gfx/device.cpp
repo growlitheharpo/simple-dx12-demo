@@ -113,9 +113,22 @@ Microsoft::WRL::ComPtr<ID3D12Device2> Device::GetDevice(Microsoft::WRL::ComPtr<I
 	return d3d12Device2;
 }
 
-bool Device::Create()
+bool Device::Create(bool useWarp)
 {
-	m_adapterHandle = GetAdapter(false);
+	{
+#if USING(DX12_DEBUG_LAYER)
+		// Always enable the debug layer before doing anything DX12 related
+		// so all possible errors generated while creating DX12 objects
+		// are caught by the debug layer.
+		ComPtr<ID3D12Debug> debugInterface;
+		if (SUCCEEDED(D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface))))
+		{
+			debugInterface->EnableDebugLayer();
+		}
+#endif
+	}
+
+	m_adapterHandle = GetAdapter(useWarp);
 	if (m_adapterHandle)
 	{
 		m_deviceHandle = GetDevice(m_adapterHandle);

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gfx/util.h"
+
 #include "types.h"
 
 #include <wrl.h>
@@ -20,12 +22,13 @@ private:
 	static ComPtr<IDXGIAdapter4> GetAdapter(bool useWarp);
 	static ComPtr<ID3D12Device2> GetDevice(Microsoft::WRL::ComPtr<IDXGIAdapter4> adapter);
 
-public:
-	bool Create();
-	void Destroy();
-
+	ALLOW_GFX_ACCESS();
 	ComPtr<ID3D12Device2> GetRawDeviceHandle() const
 	{
 		return m_deviceHandle;
 	}
+
+public:
+	bool Create(bool useWarp);
+	void Destroy();
 };

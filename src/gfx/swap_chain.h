@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gfx/util.h"
+
 #include "types.h"
 
 #include <wrl.h>
@@ -20,6 +22,12 @@ private:
 
 	void CheckForTearingSupport();
 
+	ALLOW_GFX_ACCESS();
+	ComPtr<IDXGISwapChain4> GetRawSwapChainHandle() const
+	{
+		return m_swapChain;
+	}
+
 public:
 	bool Create(const Window& window, const CommandQueue& commandQueue, uint32 width, uint32 height, uint32 bufferCount);
 	void Destroy();
@@ -32,8 +40,7 @@ public:
 		return m_tearingSupport > 0;
 	}
 
-	ComPtr<IDXGISwapChain4> GetRawSwapChainHandle() const 
-	{
-		return m_swapChain;
-	}
+	uint32 GetCurrentFrameIndex() const;
+	
+	void Present(bool useVsync);
 };

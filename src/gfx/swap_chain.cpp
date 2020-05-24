@@ -73,3 +73,15 @@ bool SwapChain::Create(const Window& window, const CommandQueue& commandQueue, u
 
 	return true;
 }
+
+uint32 SwapChain::GetCurrentFrameIndex() const
+{
+	return m_swapChain->GetCurrentBackBufferIndex();
+}
+
+void SwapChain::Present(bool useVsync)
+{
+	uint32 syncInterval = useVsync ? 1 : 0;
+	uint32 presentFlags = HasTearingSupport() && !useVsync ? DXGI_PRESENT_ALLOW_TEARING : 0;
+	m_swapChain->Present(syncInterval, presentFlags);
+}

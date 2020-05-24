@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gfx/util.h"
+
 #include "types.h"
 
 #include <wrl.h>
@@ -26,12 +28,13 @@ public:
 private:
 	ComPtr<ID3D12DescriptorHeap> m_heap;
 
-public:
-	bool Create(const Device& d, DescriptorHeapType type, uint32 numDescriptors);
-	void Destroy();
-
+	ALLOW_GFX_ACCESS();
 	ComPtr<ID3D12DescriptorHeap> GetRawDescriptorHeapHandle() const
 	{
 		return m_heap;
 	}
+
+public:
+	bool Create(const Device& d, DescriptorHeapType type, uint32 numDescriptors);
+	void Destroy();
 };

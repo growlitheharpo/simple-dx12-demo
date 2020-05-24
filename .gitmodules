@@ -1,0 +1,3 @@
+[submodule "external/google-mathfu"]
+	path = external/google-mathfu
+	url = https://github.com/google/mathfu.git

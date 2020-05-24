@@ -7,3 +7,13 @@
 	}
 
 #define TEST_EQUIVALENT_ENUM(x, y) static_assert(x == y, "Enum values are not equal! Casting will fail.")
+
+#define ALLOW_GFX_ACCESS()       \
+	friend class CommandList;    \
+	friend class CommandQueue;   \
+	friend class DescriptorHeap; \
+	friend class Device;         \
+	friend class Fence;          \
+	friend class FrameCtx;       \
+	friend class Resource;       \
+	friend class SwapChain

@@ -19,15 +19,21 @@ bool FrameCtx::Create(size_t index, const Device& d, const SwapChain& sc, const 
 	CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(descriptorHeap->GetCPUDescriptorHandleForHeapStart());
 	rtvHandle.Offset(int32(index * rtvDescriptorSize));
 
-	HRESULT r= swapChain->GetBuffer(uint32(index), IID_PPV_ARGS(&m_backBuffer));
+	auto& rawBackbuffer = m_backBuffer.GetRawResourceHandle();
+	HRESULT r = swapChain->GetBuffer(uint32(index), IID_PPV_ARGS(&rawBackbuffer));
 	if (!SUCCEEDED(r))
 		return false;
 
-	device->CreateRenderTargetView(m_backBuffer.Get(), nullptr, rtvHandle);
+	device->CreateRenderTargetView(rawBackbuffer.Get(), nullptr, rtvHandle);
 
 	r = device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE(allocatorType), IID_PPV_ARGS(&m_commandAllocator));
 	if (!SUCCEEDED(r))
 		return false;
 
 	return true;
+}
+
+void FrameCtx::ResetCommandAllocator()
+{
+	m_commandAllocator->Reset();
 }
