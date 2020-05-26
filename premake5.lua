@@ -28,7 +28,7 @@ function include_mathfu(useSysInclude)
 	}
 end
 
-workspace "dx12-tutorual"
+workspace "dx12-tutorial"
 	location "build/"
 	language "C++"
 	cppdialect "c++17"
@@ -72,6 +72,7 @@ workspace "dx12-tutorual"
 			"d3d12.lib",
 			"dxgi.lib",
 			"dxguid.lib",
+			"d3dcompiler.lib",
 		}
 
 	filter {}
@@ -94,8 +95,23 @@ project "dx12-tutorial"
 	set_location()
 	kind "WindowedApp"
 	files {
-		"src/**",
+		"src/**.cpp",
+		"src/**.h",
+		"src/**.hlsl",
 	}
+
+	debugdir("%{wks.location}")
+
+	filter { "files:**.hlsl" }
+		shaderobjectfileoutput("%{wks.location}/shaders/%{file.name}.cso")
+		shadermodel "6.0"
+	filter { "files:**_vs.hlsl" }
+		shadertype "Vertex"
+		shaderentry "main"
+	filter { "files:**_ps.hlsl" }
+		shadertype "Pixel"
+		shaderentry "main"
+	filter {}
 
 	include_mathfu()
 	includedirs {

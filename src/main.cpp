@@ -19,6 +19,8 @@
 #include <d3d12.h>
 #include <dxgi1_6.h>
 
+#include <d3dcompiler.h>
+
 // Constants
 constexpr uint8 NumFrames = 3;
 
@@ -130,6 +132,12 @@ LRESULT CALLBACK wndProc(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam)
 
 int wWinMain(HINSTANCE hInstanceExe, HINSTANCE, PTSTR pszCmdLine, int nCmdShow)
 {
+	// test
+	Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderBlob;
+	HRESULT r = D3DReadFileToBlob(TEXT("shaders/simple_vs.hlsl.cso"), &vertexShaderBlob);
+	if (!SUCCEEDED(r))
+		abort();
+
 	s_window.Create(wndProc, hInstanceExe, s_winWidth, s_winHeight);
 
 	s_device.Create(false);
