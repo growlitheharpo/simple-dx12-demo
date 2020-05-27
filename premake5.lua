@@ -28,11 +28,11 @@ function include_mathfu(useSysInclude)
 	}
 end
 
-workspace "dx12-tutorial"
+workspace "dx12-playground"
 	location "build/"
 	language "C++"
 	cppdialect "c++17"
-	startproject "dx12-tutorial"
+	startproject "dx12-playground"
 
 	architecture "x86_64"
 	configurations { "Debug", "Release" }
@@ -91,7 +91,7 @@ workspace "dx12-tutorial"
 	targetdir ("build/bin/%{prj.name}/%{cfg.longname}")
 	objdir ("build/obj/%{prj.name}/%{cfg.longname}")
 
-project "dx12-tutorial"
+project "dx12-playground"
 	set_location()
 	kind "WindowedApp"
 	files {

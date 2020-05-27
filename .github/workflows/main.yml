@@ -1,0 +1,26 @@
+name: CI
+
+on: [push, pull_request]
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  build-win:
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        config: [debug, release]
+
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        clean: 'true'
+        submodules: 'recursive'
+
+    - name: Premake
+      run: .\premake.bat
+
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v1.0.0
+
+    - name: Build
+      run: msbuild build\dx12-playground.sln -m /p:platform=x64 /p:configuration=${{ matrix.config }}
