@@ -1,6 +1,5 @@
 #pragma once
 
-#include "gfx/resource_state.h"
 #include "gfx/util.h"
 
 #include <wrl.h>
