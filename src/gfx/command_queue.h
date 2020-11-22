@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gfx/command_type.h"
+#include "gfx/enums/command_type.h"
 #include "gfx/util.h"
 
 #include <wrl.h>
@@ -20,7 +20,7 @@ public:
 
 private:
 	ComPtr<ID3D12CommandQueue> m_commandQueue;
-	
+
 	ALLOW_GFX_ACCESS();
 	ComPtr<ID3D12CommandQueue> GetRawCommandQueueHandle() const
 	{
@@ -28,7 +28,6 @@ private:
 	}
 
 public:
-
 	bool Create(const Device& d, CommandQueueType type);
 	void Destroy();
 

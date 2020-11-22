@@ -16,6 +16,8 @@ class Window
 {
 private:
 	HWND m_window;
+	int32 m_width;
+	int32 m_height;
 
 	ALLOW_GFX_ACCESS();
 	HWND GetRawWindowHandle() const
@@ -28,4 +30,14 @@ public:
 	void Destroy();
 
 	void Show();
+
+	int32 GetWidth() const
+	{
+		return m_width;
+	}
+
+	int32 GetHeight() const
+	{
+		return m_height;
+	}
 };

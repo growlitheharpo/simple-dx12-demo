@@ -14,8 +14,10 @@
 
 #include "types.h"
 #include "using.h"
+#include "vector.h"
 
 // Unfortunately, ComPtr requires us to include the internals :(
+#include <DirectXMath.h>
 #include <d3d12.h>
 #include <dxgi1_6.h>
 
@@ -40,6 +42,105 @@ namespace
 	FrameCtx s_frames[NumFrames];
 	CommandQueue s_commandQueue;
 	CommandList s_commandList;
+}
+
+#pragma pack(push, 1)
+struct VertexPosColor
+{
+	Vector3fp position;
+	Vector3fp color;
+};
+#pragma pack(pop)
+
+static VertexPosColor s_verts[] = {
+	{Vector3fp(Vector3f(-1.0f, -1.0f, -1.0f)), Vector3fp(Vector3f(0.0f, 0.0f, 0.0f))},
+	{Vector3fp(Vector3f(-1.0f, 1.0f, -1.0f)), Vector3fp(Vector3f(0.0f, 1.0f, 0.0f))},
+	{Vector3fp(Vector3f(1.0f, 1.0f, -1.0f)), Vector3fp(Vector3f(1.0f, 1.0f, 0.0f))},
+	{Vector3fp(Vector3f(1.0f, -1.0f, -1.0f)), Vector3fp(Vector3f(1.0f, 0.0f, 0.0f))},
+	{Vector3fp(Vector3f(-1.0f, -1.0f, 1.0f)), Vector3fp(Vector3f(0.0f, 0.0f, 1.0f))},
+	{Vector3fp(Vector3f(-1.0f, 1.0f, 1.0f)), Vector3fp(Vector3f(0.0f, 1.0f, 1.0f))},
+	{Vector3fp(Vector3f(1.0f, 1.0f, 1.0f)), Vector3fp(Vector3f(1.0f, 1.0f, 1.0f))},
+	{Vector3fp(Vector3f(1.0f, -1.0f, 1.0f)), Vector3fp(Vector3f(1.0f, 0.0f, 1.0f))},
+};
+
+// clang-format off
+static uint16 s_indices[] = {
+	0, 1, 2, 0, 2, 3,
+	4, 6, 5, 4, 7, 6,
+	4, 5, 1, 4, 1, 0,
+	3, 2, 6, 3, 6, 7,
+	1, 5, 6, 1, 6, 2,
+	4, 0, 3, 4, 3, 7,
+};
+// clang-format on
+
+void UpdateBufferResource(
+	const Device& d,
+	const CommandList& cmdList,
+	Resource& destinationResource,
+	Resource& intermediateResource,
+	size_t numElements,
+	size_t elementSize,
+	const void* bufferData,
+	ResourceFlags flags = ResourceFlags::None)
+{
+	if (!bufferData)
+		return;
+
+	size_t totalSize = numElements * elementSize;
+
+	// Create committed destination resource
+	{
+		ResourceCreateDesc desc;
+		desc.size = totalSize;
+		desc.resource.flags = flags;
+
+		if (!destinationResource.CreateCommittedResource(d, desc))
+			return;
+	}
+
+	// Create intermediate resource
+	{
+		ResourceCreateDesc desc;
+		desc.size = totalSize;
+		desc.resource.flags = flags;
+		desc.resource.state = ResourceState::GenericRead;
+		desc.heap.type = HeapType::Upload;
+
+		if (!intermediateResource.CreateCommittedResource(d, desc))
+			return;
+	}
+
+	SubresourceData data;
+	data.data = bufferData;
+	data.rowPitch = totalSize;
+	data.slicePitch = totalSize;
+
+	UpdateSubresourceData updateSubresource;
+	updateSubresource.intermediateOffset = 0;
+	updateSubresource.firstSubresource = 0;
+	updateSubresource.numSubresources = 1;
+	updateSubresource.srcData = &data;
+
+	cmdList.UpdateSubresource(destinationResource, intermediateResource, updateSubresource);
+}
+
+Resource s_vertexBuffer;
+
+void LoadContent(
+	const Device& d,
+	const CommandList& cmdList,
+	const CommandQueue& cmdQueue)
+{
+	Resource intermediateVertexBuffer;
+	UpdateBufferResource(
+		d,
+		cmdList,
+		s_vertexBuffer,
+		intermediateVertexBuffer,
+		_countof(s_verts),
+		sizeof(s_verts[0]),
+		s_verts);
 }
 
 bool s_useVsync = true;
@@ -133,11 +234,11 @@ LRESULT CALLBACK wndProc(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam)
 int wWinMain(HINSTANCE hInstanceExe, HINSTANCE, PTSTR pszCmdLine, int nCmdShow)
 {
 	// test
-	Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderBlob;
-	HRESULT r = D3DReadFileToBlob(TEXT("shaders/simple_vs.hlsl.cso"), &vertexShaderBlob);
-	if (!SUCCEEDED(r))
-		abort();
-
+	//Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderBlob;
+	//HRESULT r = D3DReadFileToBlob(TEXT("shaders/simple_vs.hlsl.cso"), &vertexShaderBlob);
+	//if (!SUCCEEDED(r))
+	//	abort();
+	//
 	s_window.Create(wndProc, hInstanceExe, s_winWidth, s_winHeight);
 
 	s_device.Create(false);

@@ -1,10 +1,31 @@
 #pragma once
 
+#include "gfx/enums/heap_flags.h"
+#include "gfx/enums/heap_type.h"
+#include "gfx/enums/resource_flags.h"
+#include "gfx/enums/resource_state.h"
 #include "gfx/util.h"
 
 #include <wrl.h>
 
 struct ID3D12Resource;
+
+struct ResourceCreateDesc
+{
+	size_t size = 0;
+
+	struct
+	{
+		ResourceFlags flags = ResourceFlags::None;
+		ResourceState state = ResourceState::CopyDest;
+	} resource;
+
+	struct
+	{
+		HeapType type = HeapType::Default;
+		HeapFlags flags = HeapFlags::AllowAllBuffersAndTextures;
+	} heap;
+};
 
 class Resource
 {
@@ -28,4 +49,5 @@ private:
 	}
 
 public:
+	bool CreateCommittedResource(const Device& d, const ResourceCreateDesc& desc);
 };
