@@ -41,6 +41,6 @@ public:
 	}
 
 	uint32 GetCurrentFrameIndex() const;
-	
+
 	void Present(bool useVsync);
 };

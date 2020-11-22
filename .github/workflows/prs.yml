@@ -1,9 +1,7 @@
-name: CI
+name: PRs
 
 on:
-  push:
-    branches:
-      - master
+  pull_request:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
@@ -33,7 +31,7 @@ jobs:
 
     - name: Premake
       run: .\premake.bat
-
+      
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v1.0.2
 

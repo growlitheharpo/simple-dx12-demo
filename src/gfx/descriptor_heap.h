@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gfx/enums/descriptor_heap_type.h"
 #include "gfx/util.h"
 
 #include "types.h"
@@ -8,16 +9,6 @@
 
 struct ID3D12DescriptorHeap;
 class Device;
-
-enum class DescriptorHeapType : int
-{
-	Cbv_Srv_Uav,
-	Sampler,
-	RTV,
-	DSV,
-
-	Count,
-};
 
 class DescriptorHeap
 {

@@ -39,25 +39,25 @@ bool Window::Create(WndProc wndProc, HINSTANCE instance, uint32 width, uint32 he
 	RECT windowRect = {0, 0, static_cast<LONG>(width), static_cast<LONG>(height)};
 	::AdjustWindowRect(&windowRect, WS_OVERLAPPEDWINDOW, FALSE);
 
-	int windowWidth = windowRect.right - windowRect.left;
-	int windowHeight = windowRect.bottom - windowRect.top;
+	m_width = windowRect.right - windowRect.left;
+	m_height = windowRect.bottom - windowRect.top;
 
 	// Center the window within the screen. Clamp to 0, 0 for the top-left corner.
-	int windowX = std::max<int>(0, (screenWidth - windowWidth) / 2);
-	int windowY = std::max<int>(0, (screenHeight - windowHeight) / 2);
+	int windowX = std::max<int>(0, (screenWidth - m_width) / 2);
+	int windowY = std::max<int>(0, (screenHeight - m_height) / 2);
 
 	HWND hWnd = ::CreateWindowExW(
-		NULL, 
-		windowClassName, 
-		windowTitle, 
-		WS_OVERLAPPEDWINDOW, 
-		windowX, 
-		windowY, 
-		windowWidth, 
-		windowHeight, 
-		NULL, 
-		NULL, 
-		instance, 
+		NULL,
+		windowClassName,
+		windowTitle,
+		WS_OVERLAPPEDWINDOW,
+		windowX,
+		windowY,
+		m_width,
+		m_height,
+		NULL,
+		NULL,
+		instance,
 		nullptr);
 
 	DWORD x = GetLastError();

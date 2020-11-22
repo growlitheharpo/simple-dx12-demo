@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gfx/command_type.h"
+#include "gfx/enums/command_type.h"
 #include "gfx/resource.h"
 #include "gfx/util.h"
 
