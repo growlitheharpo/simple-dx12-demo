@@ -34,7 +34,7 @@ ComPtr<IDXGIAdapter4> Device::GetAdapter(bool useWarp)
 		r = dxgiFactory->EnumWarpAdapter(IID_PPV_ARGS(&dxgiAdapter1));
 		if (!SUCCEEDED(r))
 			return nullptr;
-		
+
 		r = dxgiAdapter1.As(&dxgiAdapter4);
 		if (!SUCCEEDED(r))
 			return nullptr;

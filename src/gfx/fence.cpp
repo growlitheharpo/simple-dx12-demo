@@ -31,7 +31,7 @@ void Fence::Destroy()
 uint64 Fence::Signal(const CommandQueue& q)
 {
 	++m_fenceValue;
-	
+
 	auto cmdQueue = q.GetRawCommandQueueHandle();
 	cmdQueue->Signal(m_fence.Get(), m_fenceValue);
 
