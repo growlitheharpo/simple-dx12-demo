@@ -7,6 +7,7 @@
 #include <d3d12.h>
 
 #include <algorithm>
+#include <iterator>
 #include <vector>
 
 DECLARE_EQUIVALENT_ENUM(CommandQueueType, D3D12_COMMAND_LIST_TYPE);
