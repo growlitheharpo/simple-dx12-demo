@@ -28,6 +28,34 @@ function include_mathfu(useSysInclude)
 	}
 end
 
+function include_entt()
+end
+
+function include_self()
+	includedirs {
+		"include/",
+		"src/",
+	}
+	files {
+		"include/**",
+		"src/**",
+	}
+end
+
+function include_heart(also_link)
+	includedirs {
+		get_root_location() .. "external/heart/heart/heart-core/include/",
+		get_root_location() .. "external/heart/heart/heart-stl/include/",
+	}
+	if also_link then
+		dependson('heart-stl')
+		links {
+			'heart-core',
+			-- 'heart-stl', -- does not actually "build", so no need to link
+		}
+	end
+end
+
 workspace "dx12-playground"
 	location "build/"
 	language "C++"
@@ -40,6 +68,11 @@ workspace "dx12-playground"
 	defines {
 		"IN_USE=2",
 		"NOT_IN_USE=4",
+	}
+
+	defines {
+		"HEART_HAS_ENTT=0",
+		"HEART_HAS_RAPIDJSON=0",
 	}
 
 	defines {
@@ -114,6 +147,7 @@ project "dx12-playground"
 	filter {}
 
 	include_mathfu()
+	include_heart(true)
 	includedirs {
 		"external/microsoft",
 		"src/",
@@ -128,5 +162,9 @@ project "google-mathfu"
 	files {
 		"external/google-mathfu/include/**",
 	}
+
+group "heart"
+	include "external/heart/heart/heart-core"
+	include "external/heart/heart/heart-stl"
 
 group "*"
