@@ -31,7 +31,7 @@ end
 workspace "dx12-playground"
 	location "build/"
 	language "C++"
-	cppdialect "c++17"
+	cppdialect "c++20"
 	startproject "dx12-playground"
 
 	architecture "x86_64"
@@ -65,16 +65,6 @@ workspace "dx12-playground"
 			"RELEASE=IN_USE"
 		}
 		optimize "On"
-
-	filter {"system:windows", "action:vs*"}
-		systemversion "latest"
-		links {
-			"d3d12.lib",
-			"dxgi.lib",
-			"dxguid.lib",
-			"d3dcompiler.lib",
-		}
-
 	filter {}
 
 	flags {
@@ -111,6 +101,16 @@ project "dx12-playground"
 	filter { "files:**_ps.hlsl" }
 		shadertype "Pixel"
 		shaderentry "main"
+	filter {}
+	
+	filter {"system:windows", "action:vs*"}
+		systemversion "latest"
+		links {
+			"d3d12.lib",
+			"dxgi.lib",
+			"dxguid.lib",
+			"d3dcompiler.lib",
+		}
 	filter {}
 
 	include_mathfu()
