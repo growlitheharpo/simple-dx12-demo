@@ -3,8 +3,6 @@
 #include "gfx/enums/command_type.h"
 #include "gfx/util.h"
 
-#include <wrl.h>
-
 #include <initializer_list>
 
 struct ID3D12CommandQueue;
@@ -14,20 +12,19 @@ class CommandList;
 
 class CommandQueue
 {
-public:
-	template <typename T>
-	using ComPtr = Microsoft::WRL::ComPtr<T>;
-
 private:
-	ComPtr<ID3D12CommandQueue> m_commandQueue;
+	ID3D12CommandQueue* m_commandQueue = nullptr;
 
 	ALLOW_GFX_ACCESS();
-	ComPtr<ID3D12CommandQueue> GetRawCommandQueueHandle() const
+	ID3D12CommandQueue* GetRawCommandQueueHandle() const
 	{
 		return m_commandQueue;
 	}
 
 public:
+	CommandQueue() = default;
+	~CommandQueue();
+
 	bool Create(const Device& d, CommandQueueType type);
 	void Destroy();
 

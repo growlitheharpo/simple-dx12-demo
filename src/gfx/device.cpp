@@ -1,6 +1,8 @@
 #include "device.h"
 #include "using.h"
 
+#include <heart/scope_exit.h>
+
 #include <wrl.h>
 
 // DirectX headers
@@ -11,7 +13,7 @@
 
 using namespace Microsoft::WRL;
 
-ComPtr<IDXGIAdapter4> Device::GetAdapter(bool useWarp)
+IDXGIAdapter4* Device::GetAdapter(bool useWarp)
 {
 	ComPtr<IDXGIFactory4> dxgiFactory;
 	UINT createFactoryFlags = 0;
@@ -61,13 +63,16 @@ ComPtr<IDXGIAdapter4> Device::GetAdapter(bool useWarp)
 		}
 	}
 
-	return dxgiAdapter4;
+	// Moving out of COM, add a ref so we don't Release the object
+	dxgiAdapter4->AddRef();
+
+	return dxgiAdapter4.Get();
 }
 
-Microsoft::WRL::ComPtr<ID3D12Device2> Device::GetDevice(Microsoft::WRL::ComPtr<IDXGIAdapter4> adapter)
+ID3D12Device2* Device::GetDevice(IDXGIAdapter4* adapter)
 {
 	ComPtr<ID3D12Device2> d3d12Device2;
-	HRESULT r = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&d3d12Device2));
+	HRESULT r = D3D12CreateDevice(adapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&d3d12Device2));
 	if (!SUCCEEDED(r))
 		return nullptr;
 
@@ -110,11 +115,23 @@ Microsoft::WRL::ComPtr<ID3D12Device2> Device::GetDevice(Microsoft::WRL::ComPtr<I
 	}
 #endif
 
-	return d3d12Device2;
+	// Moving out of COM, add a ref so we don't Release the object
+	d3d12Device2->AddRef();
+
+	return d3d12Device2.Get();
+}
+
+Device::~Device()
+{
+	Destroy();
 }
 
 bool Device::Create(bool useWarp)
 {
+	HeartScopeGuard destroyGuard([&] {
+		Destroy();
+	});
+
 	{
 #if USING(DX12_DEBUG_LAYER)
 		// Always enable the debug layer before doing anything DX12 related
@@ -134,9 +151,25 @@ bool Device::Create(bool useWarp)
 		m_deviceHandle = GetDevice(m_adapterHandle);
 		if (m_deviceHandle)
 		{
+			destroyGuard.Dismiss();
 			return true;
 		}
 	}
 
 	return false;
+}
+
+void Device::Destroy()
+{
+	if (m_deviceHandle)
+	{
+		m_deviceHandle->Release();
+		m_deviceHandle = nullptr;
+	}
+
+	if (m_adapterHandle)
+	{
+		m_adapterHandle->Release();
+		m_adapterHandle = nullptr;
+	}
 }

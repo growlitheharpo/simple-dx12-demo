@@ -3,6 +3,8 @@
 #include "gfx/device.h"
 #include "gfx/util.h"
 
+#include <heart/scope_exit.h>
+
 #include <d3d12.h>
 #include <d3dx12.h>
 
@@ -66,8 +68,17 @@ TEST_EQUIVALENT_ENUM(HeapFlags::AllowOnlyBuffers, D3D12_HEAP_FLAG_ALLOW_ONLY_BUF
 TEST_EQUIVALENT_ENUM(HeapFlags::AllowOnlyNonRtDsTextures, D3D12_HEAP_FLAG_ALLOW_ONLY_NON_RT_DS_TEXTURES);
 TEST_EQUIVALENT_ENUM(HeapFlags::AllowOnlyRtDsTextures, D3D12_HEAP_FLAG_ALLOW_ONLY_RT_DS_TEXTURES);
 
+Resource::~Resource()
+{
+	Destroy();
+}
+
 bool Resource::CreateCommittedResource(const Device& d, const ResourceCreateDesc& desc)
 {
+	HeartScopeGuard destroyGuard([&] {
+		Destroy();
+	});
+
 	auto device = d.GetRawDeviceHandle();
 	auto heapProperties = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE(desc.heap.type));
 	auto resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(desc.size, D3D12_RESOURCE_FLAGS(desc.resource.flags));
@@ -83,5 +94,15 @@ bool Resource::CreateCommittedResource(const Device& d, const ResourceCreateDesc
 	if (!SUCCEEDED(r))
 		return false;
 
+	destroyGuard.Dismiss();
 	return true;
+}
+
+void Resource::Destroy()
+{
+	if (m_resource)
+	{
+		m_resource->Release();
+		m_resource = nullptr;
+	}
 }

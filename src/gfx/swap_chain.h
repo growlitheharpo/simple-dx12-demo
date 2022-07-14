@@ -4,31 +4,28 @@
 
 #include "types.h"
 
-#include <wrl.h>
-
 struct IDXGISwapChain4;
 class CommandQueue;
 class Window;
 
 class SwapChain
 {
-public:
-	template <typename T>
-	using ComPtr = Microsoft::WRL::ComPtr<T>;
-
 private:
-	ComPtr<IDXGISwapChain4> m_swapChain;
+	IDXGISwapChain4* m_swapChain = nullptr;
 	int m_tearingSupport = -1;
 
 	void CheckForTearingSupport();
 
 	ALLOW_GFX_ACCESS();
-	ComPtr<IDXGISwapChain4> GetRawSwapChainHandle() const
+	IDXGISwapChain4* GetRawSwapChainHandle() const
 	{
 		return m_swapChain;
 	}
 
 public:
+	SwapChain() = default;
+	~SwapChain();
+
 	bool Create(const Window& window, const CommandQueue& commandQueue, uint32 width, uint32 height, uint32 bufferCount);
 	void Destroy();
 

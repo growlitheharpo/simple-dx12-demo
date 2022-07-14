@@ -5,16 +5,27 @@
 #include "gfx/frame_ctx.h"
 #include "gfx/swap_chain.h"
 
+#include <heart/scope_exit.h>
+
 #include <d3d12.h>
 #include <d3dx12.h>
 #include <dxgi1_6.h>
 
+CommandList::~CommandList()
+{
+	Destroy();
+}
+
 bool CommandList::Create(const Device& d, const FrameCtx& fc, CommandQueueType type)
 {
+	HeartScopeGuard destroyGuard([&] {
+		Destroy();
+	});
+
 	auto device = d.GetRawDeviceHandle();
 	auto commandAllocator = fc.GetRawCommandAllocatorHandle();
 
-	HRESULT r = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE(type), commandAllocator.Get(), nullptr, IID_PPV_ARGS(&m_commandList));
+	HRESULT r = device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE(type), commandAllocator, nullptr, IID_PPV_ARGS(&m_commandList));
 	if (!SUCCEEDED(r))
 		return false;
 
@@ -22,18 +33,28 @@ bool CommandList::Create(const Device& d, const FrameCtx& fc, CommandQueueType t
 	if (!SUCCEEDED(r))
 		return false;
 
+	destroyGuard.Dismiss();
 	return true;
+}
+
+void CommandList::Destroy()
+{
+	if (m_commandList)
+	{
+		m_commandList->Release();
+		m_commandList = nullptr;
+	}
 }
 
 void CommandList::Reset(const FrameCtx& fc)
 {
-	m_commandList->Reset(fc.GetRawCommandAllocatorHandle().Get(), nullptr);
+	m_commandList->Reset(fc.GetRawCommandAllocatorHandle(), nullptr);
 }
 
-void CommandList::Transition(const Resource& r, ResourceState from, ResourceState to)
+void CommandList::Transition(Resource& r, ResourceState from, ResourceState to)
 {
 	auto barrier = CD3DX12_RESOURCE_BARRIER::Transition(
-		r.GetRawResourceHandle().Get(),
+		r.GetRawResourceHandle(),
 		D3D12_RESOURCE_STATES(from),
 		D3D12_RESOURCE_STATES(to));
 	m_commandList->ResourceBarrier(1, &barrier);
@@ -49,11 +70,11 @@ void CommandList::Clear(const Device& d, const DescriptorHeap& heap, const SwapC
 	m_commandList->ClearRenderTargetView(rtv, color.data_, 0, nullptr);
 }
 
-void CommandList::UpdateSubresource(const Resource& destination, const Resource& intermediate, UpdateSubresourceData data) const
+void CommandList::UpdateSubresource(Resource& destination, Resource& intermediate, UpdateSubresourceData data) const
 {
-	auto dest = destination.GetRawResourceHandle().Get();
-	auto interm = intermediate.GetRawResourceHandle().Get();
-	auto cmdList = this->GetRawCommandListHandle().Get();
+	auto dest = destination.GetRawResourceHandle();
+	auto interm = intermediate.GetRawResourceHandle();
+	auto cmdList = this->GetRawCommandListHandle();
 
 	// Static assert that the reinterpret_cast will "succeed"
 	// TODO: There *must* be a better way to do this without exposing everything

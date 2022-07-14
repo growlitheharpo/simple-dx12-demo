@@ -6,8 +6,6 @@
 #include "gfx/enums/resource_state.h"
 #include "gfx/util.h"
 
-#include <wrl.h>
-
 struct ID3D12Resource;
 
 struct ResourceCreateDesc
@@ -29,25 +27,31 @@ struct ResourceCreateDesc
 
 class Resource
 {
-public:
-	template <typename T>
-	using ComPtr = Microsoft::WRL::ComPtr<T>;
-
 private:
-	ComPtr<ID3D12Resource> m_resource;
+	ID3D12Resource* m_resource = nullptr;
 
 	ALLOW_GFX_ACCESS();
 
-	ComPtr<ID3D12Resource>& GetRawResourceHandle()
+	ID3D12Resource* GetRawResourceHandle()
 	{
 		return m_resource;
 	}
 
-	const ComPtr<ID3D12Resource>& GetRawResourceHandle() const
+	const ID3D12Resource* GetRawResourceHandle() const
+	{
+		return m_resource;
+	}
+
+	ID3D12Resource*& GetRawResourceRef()
 	{
 		return m_resource;
 	}
 
 public:
+	Resource() = default;
+	~Resource();
+
 	bool CreateCommittedResource(const Device& d, const ResourceCreateDesc& desc);
+
+	void Destroy();
 };

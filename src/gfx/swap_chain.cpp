@@ -4,8 +4,11 @@
 #include "gfx/command_queue.h"
 #include "gfx/window.h"
 
+#include <heart/scope_exit.h>
+
 #include <d3d12.h>
 #include <dxgi1_6.h>
+#include <wrl.h>
 
 void SwapChain::CheckForTearingSupport()
 {
@@ -15,10 +18,10 @@ void SwapChain::CheckForTearingSupport()
 	// DXGI 1.4 interface and query for the 1.5 interface. This is to enable the
 	// graphics debugging tools which will not support the 1.5 factory interface
 	// until a future update.
-	ComPtr<IDXGIFactory4> factory4;
+	Microsoft::WRL::ComPtr<IDXGIFactory4> factory4;
 	if (SUCCEEDED(CreateDXGIFactory1(IID_PPV_ARGS(&factory4))))
 	{
-		ComPtr<IDXGIFactory5> factory5;
+		Microsoft::WRL::ComPtr<IDXGIFactory5> factory5;
 		if (SUCCEEDED(factory4.As(&factory5)))
 		{
 			if (FAILED(factory5->CheckFeatureSupport(DXGI_FEATURE_PRESENT_ALLOW_TEARING, &allowTearing, sizeof(allowTearing))))
@@ -31,9 +34,18 @@ void SwapChain::CheckForTearingSupport()
 	m_tearingSupport = int(allowTearing);
 }
 
+SwapChain::~SwapChain()
+{
+	Destroy();
+}
+
 bool SwapChain::Create(const Window& window, const CommandQueue& commandQueue, uint32 width, uint32 height, uint32 bufferCount)
 {
-	ComPtr<IDXGIFactory4> dxgiFactory4;
+	HeartScopeGuard destroyGuard([&] {
+		Destroy();
+	});
+
+	Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory4 = nullptr;
 	UINT createFactoryFlags = 0;
 
 #if USING(DEBUGGING)
@@ -59,19 +71,34 @@ bool SwapChain::Create(const Window& window, const CommandQueue& commandQueue, u
 
 	auto wnd = window.GetRawWindowHandle();
 	auto cmdQueue = commandQueue.GetRawCommandQueueHandle();
-	ComPtr<IDXGISwapChain1> swapChain1;
-	r = dxgiFactory4->CreateSwapChainForHwnd(cmdQueue.Get(), wnd, &swapChainDesc, nullptr, nullptr, &swapChain1);
+	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain1;
+	r = dxgiFactory4->CreateSwapChainForHwnd(cmdQueue, wnd, &swapChainDesc, nullptr, nullptr, &swapChain1);
 	if (!SUCCEEDED(r))
 		return false;
 
 	// Disable the Alt+Enter fullscreen toggle feature. Switching to fullscreen will be handled manually.
 	dxgiFactory4->MakeWindowAssociation(wnd, DXGI_MWA_NO_ALT_ENTER);
 
-	r = swapChain1.As(&m_swapChain);
+	Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain4;
+	r = swapChain1.As(&swapChain4);
 	if (!SUCCEEDED(r))
 		return false;
 
+	// Moving out of COM, add a ref so we don't Release the object
+	m_swapChain = swapChain4.Get();
+	m_swapChain->AddRef();
+
+	destroyGuard.Dismiss();
 	return true;
+}
+
+void SwapChain::Destroy()
+{
+	if (m_swapChain)
+	{
+		m_swapChain->Release();
+		m_swapChain = nullptr;
+	}
 }
 
 uint32 SwapChain::GetCurrentFrameIndex() const

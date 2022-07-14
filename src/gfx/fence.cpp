@@ -3,12 +3,23 @@
 #include "gfx/command_queue.h"
 #include "gfx/device.h"
 
+#include <heart/scope_exit.h>
+
 #include <d3d12.h>
 
 #include <Windows.h>
 
+Fence::~Fence()
+{
+	Destroy();
+}
+
 bool Fence::Create(const Device& d)
 {
+	HeartScopeGuard destroyGuard([&] {
+		Destroy();
+	});
+
 	auto device = d.GetRawDeviceHandle();
 	HRESULT r = device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence));
 	if (!SUCCEEDED(r))
@@ -18,14 +29,25 @@ bool Fence::Create(const Device& d)
 	if (!m_fenceEvent)
 		return false;
 
+	destroyGuard.Dismiss();
 	return true;
 }
 
 void Fence::Destroy()
 {
-	::CloseHandle(m_fenceEvent);
-	m_fence = nullptr;
+	if (m_fenceEvent)
+	{
+		::CloseHandle(m_fenceEvent);
+		m_fenceEvent = nullptr;
+	}
+
 	m_fenceValue = 0;
+	
+	if (m_fence)
+	{
+		m_fence->Release();
+		m_fence = nullptr;
+	}
 }
 
 uint64 Fence::Signal(const CommandQueue& q)
@@ -33,7 +55,7 @@ uint64 Fence::Signal(const CommandQueue& q)
 	++m_fenceValue;
 
 	auto cmdQueue = q.GetRawCommandQueueHandle();
-	cmdQueue->Signal(m_fence.Get(), m_fenceValue);
+	cmdQueue->Signal(m_fence, m_fenceValue);
 
 	return m_fenceValue;
 }

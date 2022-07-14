@@ -16,12 +16,7 @@
 #include "using.h"
 #include "vector.h"
 
-// Unfortunately, ComPtr requires us to include the internals :(
-#include <DirectXMath.h>
-#include <d3d12.h>
-#include <dxgi1_6.h>
-
-#include <d3dcompiler.h>
+#include "Windows.h"
 
 // Constants
 constexpr uint8 NumFrames = 3;
@@ -32,17 +27,14 @@ static uint32 s_winHeight = 720;
 static bool s_isInitialized = false;
 
 // DX12/windows globals
-namespace
-{
-	Window s_window;
-	Device s_device;
-	Fence s_fence;
-	SwapChain s_swapChain;
-	DescriptorHeap s_rtvHeap;
-	FrameCtx s_frames[NumFrames];
-	CommandQueue s_commandQueue;
-	CommandList s_commandList;
-}
+static Window s_window;
+static Device s_device;
+static Fence s_fence;
+static SwapChain s_swapChain;
+static DescriptorHeap s_rtvHeap;
+static FrameCtx s_frames[NumFrames];
+static CommandQueue s_commandQueue;
+static CommandList s_commandList;
 
 #pragma pack(push, 1)
 struct VertexPosColor
