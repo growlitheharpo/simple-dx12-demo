@@ -1,3 +1,6 @@
 [submodule "external/google-mathfu"]
 	path = external/google-mathfu
 	url = https://github.com/google/mathfu.git
+[submodule "external/heart"]
+	path = external/heart
+	url = https://github.com/growlitheharpo/heart-engine-playground.git
