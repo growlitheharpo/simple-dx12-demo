@@ -6,6 +6,7 @@
 #include "gfx/core/command_list.h"
 #include "gfx/core/command_queue.h"
 #include "gfx/core/descriptor_heap.h"
+#include "gfx/core/destroy_queue.h"
 #include "gfx/core/device.h"
 #include "gfx/core/fence.h"
 #include "gfx/core/frame_ctx.h"
@@ -30,6 +31,7 @@ static bool s_isInitialized = false;
 // DX12/windows globals
 static Window s_window;
 static Device s_device;
+static DestroyQueue s_destroyQueue;
 static Fence s_fence;
 static SwapChain s_swapChain;
 static DescriptorHeap s_rtvHeap;
@@ -145,19 +147,16 @@ void Update()
 void Render()
 {
 	uint32 currentBackBufferIndex = s_swapChain.GetCurrentFrameIndex();
-	auto& frame = s_frames[currentBackBufferIndex];
-
-	frame.ResetCommandAllocator();
-	s_commandList.Reset(frame);
+	auto& endingFrame = s_frames[currentBackBufferIndex];
 
 	// Transition from Present back to RTV
-	s_commandList.Transition(frame.GetBackBuffer(), ResourceState::Present, ResourceState::RenderTarget);
+	s_commandList.Transition(endingFrame.GetBackBuffer(), ResourceState::Present, ResourceState::RenderTarget);
 
 	// Clear to blue
 	s_commandList.Clear(s_device, s_rtvHeap, s_swapChain, Vector4f(0.4f, 0.6f, 0.9f, 1.0f));
 
 	// Present
-	s_commandList.Transition(frame.GetBackBuffer(), ResourceState::RenderTarget, ResourceState::Present);
+	s_commandList.Transition(endingFrame.GetBackBuffer(), ResourceState::RenderTarget, ResourceState::Present);
 
 	// Execute
 	s_commandList.Close();
@@ -166,12 +165,18 @@ void Render()
 	// Present and signal
 	{
 		s_swapChain.Present(s_useVsync);
-		frame.SetFenceValue(s_fence.Signal(s_commandQueue));
+		endingFrame.SetFenceValue(s_fence.Signal(s_commandQueue));
 	}
 
 	// Wait for new frame
 	currentBackBufferIndex = s_swapChain.GetCurrentFrameIndex();
-	s_fence.WaitForFence(s_frames[currentBackBufferIndex].GetFenceValue());
+	auto& beginningFrame = s_frames[currentBackBufferIndex];
+	s_fence.WaitForFence(beginningFrame.GetFenceValue());
+
+	// Prepare new frame
+	s_destroyQueue.NextFrame();
+	beginningFrame.ResetCommandAllocator();
+	s_commandList.Reset(beginningFrame);
 }
 
 LRESULT CALLBACK wndProc(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -235,6 +240,9 @@ int wWinMain(HINSTANCE hInstanceExe, HINSTANCE, PTSTR pszCmdLine, int nCmdShow)
 	s_window.Create(wndProc, hInstanceExe, s_winWidth, s_winHeight);
 
 	s_device.Create(false);
+
+	s_destroyQueue.Setup(NumFrames);
+
 	s_commandQueue.Create(s_device, CommandQueueType::Direct);
 	s_swapChain.Create(s_window, s_commandQueue, s_winWidth, s_winHeight, NumFrames);
 
@@ -264,6 +272,8 @@ int wWinMain(HINSTANCE hInstanceExe, HINSTANCE, PTSTR pszCmdLine, int nCmdShow)
 
 	s_fence.Flush(s_commandQueue);
 	s_fence.Destroy();
+
+	s_destroyQueue.Flush();
 
 	return 0;
 }

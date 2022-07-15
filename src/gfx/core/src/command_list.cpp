@@ -34,6 +34,10 @@ bool CommandList::Create(const Device& d, const FrameCtx& fc, CommandQueueType t
 	if (!SUCCEEDED(r))
 		return false;
 
+	r = m_commandList->Reset(commandAllocator, nullptr);
+	if (!SUCCEEDED(r))
+		return false;
+
 	destroyGuard.Dismiss();
 	return true;
 }
