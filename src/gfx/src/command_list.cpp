@@ -3,6 +3,7 @@
 #include "gfx/descriptor_heap.h"
 #include "gfx/device.h"
 #include "gfx/frame_ctx.h"
+#include "gfx/subresource_data.h"
 #include "gfx/swap_chain.h"
 
 #include <heart/scope_exit.h>
@@ -70,7 +71,7 @@ void CommandList::Clear(const Device& d, const DescriptorHeap& heap, const SwapC
 	m_commandList->ClearRenderTargetView(rtv, color.data_, 0, nullptr);
 }
 
-void CommandList::UpdateSubresource(Resource& destination, Resource& intermediate, UpdateSubresourceData data) const
+void CommandList::UpdateSubresource(Resource& destination, Resource& intermediate, const UpdateSubresourceData& data) const
 {
 	auto dest = destination.GetRawResourceHandle();
 	auto interm = intermediate.GetRawResourceHandle();

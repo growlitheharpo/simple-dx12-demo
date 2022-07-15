@@ -1,12 +1,13 @@
 #pragma once
 
+#include "gfx/fwd.h"
+
 #include "gfx/enums/descriptor_heap_type.h"
 #include "gfx/util.h"
 
 #include "types.h"
 
 struct ID3D12DescriptorHeap;
-class Device;
 
 class DescriptorHeap
 {

@@ -9,6 +9,7 @@
 #include "gfx/device.h"
 #include "gfx/fence.h"
 #include "gfx/frame_ctx.h"
+#include "gfx/subresource_data.h"
 #include "gfx/swap_chain.h"
 #include "gfx/window.h"
 
@@ -205,7 +206,7 @@ LRESULT CALLBACK wndProc(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam)
 			int width = clientRect.right - clientRect.left;
 			int height = clientRect.bottom - clientRect.top;
 
-			//Resize(width, height);
+			// Resize(width, height);
 		}
 		break;
 		case WM_DESTROY:
@@ -226,9 +227,9 @@ LRESULT CALLBACK wndProc(HWND wnd, UINT message, WPARAM wParam, LPARAM lParam)
 int wWinMain(HINSTANCE hInstanceExe, HINSTANCE, PTSTR pszCmdLine, int nCmdShow)
 {
 	// test
-	//Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderBlob;
-	//HRESULT r = D3DReadFileToBlob(TEXT("shaders/simple_vs.hlsl.cso"), &vertexShaderBlob);
-	//if (!SUCCEEDED(r))
+	// Microsoft::WRL::ComPtr<ID3DBlob> vertexShaderBlob;
+	// HRESULT r = D3DReadFileToBlob(TEXT("shaders/simple_vs.hlsl.cso"), &vertexShaderBlob);
+	// if (!SUCCEEDED(r))
 	//	abort();
 	//
 	s_window.Create(wndProc, hInstanceExe, s_winWidth, s_winHeight);

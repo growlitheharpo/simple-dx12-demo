@@ -1,14 +1,13 @@
 #pragma once
 
+#include "gfx/fwd.h"
+
 #include "types.h"
 
 #include <chrono>
 
 struct ID3D12Fence;
 typedef void* HANDLE;
-
-class CommandQueue;
-class Device;
 
 using milliseconds = std::chrono::milliseconds;
 

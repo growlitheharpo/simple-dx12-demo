@@ -1,5 +1,7 @@
 #pragma once
 
+#include "gfx/fwd.h"
+
 #include "gfx/enums/command_type.h"
 #include "gfx/enums/resource_state.h"
 #include "gfx/util.h"
@@ -7,28 +9,6 @@
 #include "vector.h"
 
 struct ID3D12GraphicsCommandList;
-
-class Device;
-class Resource;
-class FrameCtx;
-class DescriptorHeap;
-class SwapChain;
-
-// TODO: Does this belong somewhere else?
-struct SubresourceData
-{
-	const void* data;
-	intptr rowPitch;
-	intptr slicePitch;
-};
-
-struct UpdateSubresourceData
-{
-	uint64 intermediateOffset;
-	uint32 firstSubresource;
-	uint32 numSubresources;
-	SubresourceData* srcData;
-};
 
 class CommandList
 {
@@ -53,7 +33,7 @@ public:
 	void Transition(Resource& r, ResourceState from, ResourceState to);
 	void Clear(const Device& d, const DescriptorHeap& heap, const SwapChain& c, Vector4f color);
 
-	void UpdateSubresource(Resource& destination, Resource& intermediate, UpdateSubresourceData data) const;
+	void UpdateSubresource(Resource& destination, Resource& intermediate, const UpdateSubresourceData& data) const;
 
 	void Close();
 };

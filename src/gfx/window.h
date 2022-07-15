@@ -1,5 +1,6 @@
 #pragma once
 
+#include "gfx/fwd.h"
 #include "gfx/util.h"
 
 #include "types.h"
