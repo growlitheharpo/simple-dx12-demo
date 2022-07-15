@@ -42,7 +42,7 @@ void Fence::Destroy()
 	}
 
 	m_fenceValue = 0;
-	
+
 	if (m_fence)
 	{
 		m_fence->Release();
