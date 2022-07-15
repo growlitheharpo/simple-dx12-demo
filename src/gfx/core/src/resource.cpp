@@ -1,7 +1,7 @@
-#include "gfx/resource.h"
+#include "gfx/core/resource.h"
 
-#include "gfx/device.h"
-#include "gfx/util.h"
+#include "gfx/core/device.h"
+#include "gfx/core/util.h"
 
 #include <heart/scope_exit.h>
 

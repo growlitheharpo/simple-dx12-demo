@@ -1,9 +1,9 @@
 #pragma once
 
-#include "gfx/fwd.h"
+#include "gfx/core/fwd.h"
 
-#include "gfx/enums/descriptor_heap_type.h"
-#include "gfx/util.h"
+#include "gfx/core/enums/descriptor_heap_type.h"
+#include "gfx/core/util.h"
 
 #include "types.h"
 

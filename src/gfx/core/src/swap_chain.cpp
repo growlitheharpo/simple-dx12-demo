@@ -1,9 +1,9 @@
-#include "gfx/swap_chain.h"
+#include "gfx/core/swap_chain.h"
 
 #include "using.h"
 
-#include "gfx/command_queue.h"
-#include "gfx/window.h"
+#include "gfx/core/command_queue.h"
+#include "gfx/core/window.h"
 
 #include <heart/scope_exit.h>
 

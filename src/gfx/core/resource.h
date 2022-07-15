@@ -1,10 +1,10 @@
 #pragma once
 
-#include "gfx/enums/heap_flags.h"
-#include "gfx/enums/heap_type.h"
-#include "gfx/enums/resource_flags.h"
-#include "gfx/enums/resource_state.h"
-#include "gfx/util.h"
+#include "gfx/core/enums/heap_flags.h"
+#include "gfx/core/enums/heap_type.h"
+#include "gfx/core/enums/resource_flags.h"
+#include "gfx/core/enums/resource_state.h"
+#include "gfx/core/util.h"
 
 struct ID3D12Resource;
 

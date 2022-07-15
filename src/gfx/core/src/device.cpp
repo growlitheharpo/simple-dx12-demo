@@ -1,4 +1,4 @@
-#include "gfx/device.h"
+#include "gfx/core/device.h"
 
 #include "using.h"
 

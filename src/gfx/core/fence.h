@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gfx/fwd.h"
+#include "gfx/core/fwd.h"
 
 #include "types.h"
 

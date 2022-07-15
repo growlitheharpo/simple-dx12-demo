@@ -1,7 +1,7 @@
-#include "gfx/fence.h"
+#include "gfx/core/fence.h"
 
-#include "gfx/command_queue.h"
-#include "gfx/device.h"
+#include "gfx/core/command_queue.h"
+#include "gfx/core/device.h"
 
 #include <heart/scope_exit.h>
 

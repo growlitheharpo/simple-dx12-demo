@@ -1,4 +1,4 @@
-#include "gfx/window.h"
+#include "gfx/core/window.h"
 
 #include <Windows.h> // kill me
 

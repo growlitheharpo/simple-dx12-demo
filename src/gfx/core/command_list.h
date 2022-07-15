@@ -1,10 +1,10 @@
 #pragma once
 
-#include "gfx/fwd.h"
+#include "gfx/core/fwd.h"
 
-#include "gfx/enums/command_type.h"
-#include "gfx/enums/resource_state.h"
-#include "gfx/util.h"
+#include "gfx/core/enums/command_type.h"
+#include "gfx/core/enums/resource_state.h"
+#include "gfx/core/util.h"
 
 #include "vector.h"
 

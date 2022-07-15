@@ -1,6 +1,6 @@
 #pragma once
 
-#include "gfx/fwd.h"
+#include "gfx/core/fwd.h"
 
 #define DECLARE_EQUIVALENT_ENUM(x, y)       \
 	constexpr bool operator==(x lhs, y rhs) \

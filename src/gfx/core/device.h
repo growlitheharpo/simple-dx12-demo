@@ -1,7 +1,7 @@
 #pragma once
 
-#include "gfx/fwd.h"
-#include "gfx/util.h"
+#include "gfx/core/fwd.h"
+#include "gfx/core/util.h"
 
 #include "types.h"
 

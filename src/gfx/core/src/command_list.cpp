@@ -1,10 +1,10 @@
-#include "gfx/command_list.h"
+#include "gfx/core/command_list.h"
 
-#include "gfx/descriptor_heap.h"
-#include "gfx/device.h"
-#include "gfx/frame_ctx.h"
-#include "gfx/subresource_data.h"
-#include "gfx/swap_chain.h"
+#include "gfx/core/descriptor_heap.h"
+#include "gfx/core/device.h"
+#include "gfx/core/frame_ctx.h"
+#include "gfx/core/subresource_data.h"
+#include "gfx/core/swap_chain.h"
 
 #include <heart/scope_exit.h>
 

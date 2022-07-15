@@ -1,8 +1,8 @@
-#include "gfx/command_queue.h"
+#include "gfx/core/command_queue.h"
 
-#include "gfx/command_list.h"
-#include "gfx/device.h"
-#include "gfx/util.h"
+#include "gfx/core/command_list.h"
+#include "gfx/core/device.h"
+#include "gfx/core/util.h"
 
 #include <heart/scope_exit.h>
 
