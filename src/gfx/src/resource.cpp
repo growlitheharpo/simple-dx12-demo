@@ -1,4 +1,4 @@
-#include "resource.h"
+#include "gfx/resource.h"
 
 #include "gfx/device.h"
 #include "gfx/util.h"

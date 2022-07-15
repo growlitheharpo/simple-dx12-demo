@@ -1,4 +1,4 @@
-#include "fence.h"
+#include "gfx/fence.h"
 
 #include "gfx/command_queue.h"
 #include "gfx/device.h"

@@ -1,4 +1,4 @@
-#include "command_queue.h"
+#include "gfx/command_queue.h"
 
 #include "gfx/command_list.h"
 #include "gfx/device.h"

@@ -1,4 +1,4 @@
-#include "descriptor_heap.h"
+#include "gfx/descriptor_heap.h"
 
 #include "gfx/device.h"
 #include "gfx/util.h"
