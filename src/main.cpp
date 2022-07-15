@@ -14,9 +14,12 @@
 #include "gfx/core/swap_chain.h"
 #include "gfx/core/window.h"
 
+#include "gfx/concepts/model.h"
+
+#include "gfx/formats/vertex.h"
+
 #include "types.h"
 #include "using.h"
-#include "vector.h"
 
 #include "Windows.h"
 
@@ -39,105 +42,7 @@ static FrameCtx s_frames[NumFrames];
 static CommandQueue s_commandQueue;
 static CommandList s_commandList;
 
-#pragma pack(push, 1)
-struct VertexPosColor
-{
-	Vector3fp position;
-	Vector3fp color;
-};
-#pragma pack(pop)
-
-static VertexPosColor s_verts[] = {
-	{Vector3fp(Vector3f(-1.0f, -1.0f, -1.0f)), Vector3fp(Vector3f(0.0f, 0.0f, 0.0f))},
-	{Vector3fp(Vector3f(-1.0f, 1.0f, -1.0f)), Vector3fp(Vector3f(0.0f, 1.0f, 0.0f))},
-	{Vector3fp(Vector3f(1.0f, 1.0f, -1.0f)), Vector3fp(Vector3f(1.0f, 1.0f, 0.0f))},
-	{Vector3fp(Vector3f(1.0f, -1.0f, -1.0f)), Vector3fp(Vector3f(1.0f, 0.0f, 0.0f))},
-	{Vector3fp(Vector3f(-1.0f, -1.0f, 1.0f)), Vector3fp(Vector3f(0.0f, 0.0f, 1.0f))},
-	{Vector3fp(Vector3f(-1.0f, 1.0f, 1.0f)), Vector3fp(Vector3f(0.0f, 1.0f, 1.0f))},
-	{Vector3fp(Vector3f(1.0f, 1.0f, 1.0f)), Vector3fp(Vector3f(1.0f, 1.0f, 1.0f))},
-	{Vector3fp(Vector3f(1.0f, -1.0f, 1.0f)), Vector3fp(Vector3f(1.0f, 0.0f, 1.0f))},
-};
-
-// clang-format off
-static uint16 s_indices[] = {
-	0, 1, 2, 0, 2, 3,
-	4, 6, 5, 4, 7, 6,
-	4, 5, 1, 4, 1, 0,
-	3, 2, 6, 3, 6, 7,
-	1, 5, 6, 1, 6, 2,
-	4, 0, 3, 4, 3, 7,
-};
-// clang-format on
-
-void UpdateBufferResource(
-	const Device& d,
-	const CommandList& cmdList,
-	Resource& destinationResource,
-	Resource& intermediateResource,
-	size_t numElements,
-	size_t elementSize,
-	const void* bufferData,
-	ResourceFlags flags = ResourceFlags::None)
-{
-	if (!bufferData)
-		return;
-
-	size_t totalSize = numElements * elementSize;
-
-	// Create committed destination resource
-	{
-		ResourceCreateDesc desc;
-		desc.size = totalSize;
-		desc.resource.flags = flags;
-
-		if (!destinationResource.CreateCommittedResource(d, desc))
-			return;
-	}
-
-	// Create intermediate resource
-	{
-		ResourceCreateDesc desc;
-		desc.size = totalSize;
-		desc.resource.flags = flags;
-		desc.resource.state = ResourceState::GenericRead;
-		desc.heap.type = HeapType::Upload;
-
-		if (!intermediateResource.CreateCommittedResource(d, desc))
-			return;
-	}
-
-	SubresourceData data;
-	data.data = bufferData;
-	data.rowPitch = totalSize;
-	data.slicePitch = totalSize;
-
-	UpdateSubresourceData updateSubresource;
-	updateSubresource.intermediateOffset = 0;
-	updateSubresource.firstSubresource = 0;
-	updateSubresource.numSubresources = 1;
-	updateSubresource.srcData = &data;
-
-	cmdList.UpdateSubresource(destinationResource, intermediateResource, updateSubresource);
-}
-
-Resource s_vertexBuffer;
-
-void LoadContent(
-	const Device& d,
-	const CommandList& cmdList,
-	const CommandQueue& cmdQueue)
-{
-	Resource intermediateVertexBuffer;
-	UpdateBufferResource(
-		d,
-		cmdList,
-		s_vertexBuffer,
-		intermediateVertexBuffer,
-		_countof(s_verts),
-		sizeof(s_verts[0]),
-		s_verts);
-}
-
+static Model s_model;
 bool s_useVsync = true;
 
 void Update()
@@ -255,6 +160,8 @@ int wWinMain(HINSTANCE hInstanceExe, HINSTANCE, PTSTR pszCmdLine, int nCmdShow)
 	s_commandList.Create(s_device, s_frames[currentBackBufferIndex], CommandQueueType::Direct);
 
 	s_fence.Create(s_device);
+
+	s_model.Create(s_device, s_destroyQueue, s_commandList);
 
 	s_isInitialized = true;
 

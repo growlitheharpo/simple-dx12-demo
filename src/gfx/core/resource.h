@@ -55,3 +55,13 @@ public:
 
 	void Destroy();
 };
+
+void UpdateBufferResource(
+	const Device& d,
+	const CommandList& cmdList,
+	Resource& destinationResource,
+	Resource& intermediateResource,
+	size_t numElements,
+	size_t elementSize,
+	const void* bufferData,
+	ResourceFlags flags = ResourceFlags::None);

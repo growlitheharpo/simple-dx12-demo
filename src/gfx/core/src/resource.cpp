@@ -1,6 +1,8 @@
 #include "gfx/core/resource.h"
 
+#include "gfx/core/command_list.h"
 #include "gfx/core/device.h"
+#include "gfx/core/subresource_data.h"
 #include "gfx/core/util.h"
 
 #include <heart/scope_exit.h>
@@ -105,4 +107,55 @@ void Resource::Destroy()
 		m_resource->Release();
 		m_resource = nullptr;
 	}
+}
+
+void UpdateBufferResource(
+	const Device& d,
+	const CommandList& cmdList,
+	Resource& destinationResource,
+	Resource& intermediateResource,
+	size_t numElements,
+	size_t elementSize,
+	const void* bufferData,
+	ResourceFlags flags)
+{
+	if (!bufferData)
+		return;
+
+	size_t totalSize = numElements * elementSize;
+
+	// Create committed destination resource
+	{
+		ResourceCreateDesc desc;
+		desc.size = totalSize;
+		desc.resource.flags = flags;
+
+		if (!destinationResource.CreateCommittedResource(d, desc))
+			return;
+	}
+
+	// Create intermediate resource
+	{
+		ResourceCreateDesc desc;
+		desc.size = totalSize;
+		desc.resource.flags = flags;
+		desc.resource.state = ResourceState::GenericRead;
+		desc.heap.type = HeapType::Upload;
+
+		if (!intermediateResource.CreateCommittedResource(d, desc))
+			return;
+	}
+
+	SubresourceData data;
+	data.data = bufferData;
+	data.rowPitch = totalSize;
+	data.slicePitch = totalSize;
+
+	UpdateSubresourceData updateSubresource;
+	updateSubresource.intermediateOffset = 0;
+	updateSubresource.firstSubresource = 0;
+	updateSubresource.numSubresources = 1;
+	updateSubresource.srcData = &data;
+
+	cmdList.UpdateSubresource(destinationResource, intermediateResource, updateSubresource);
 }
