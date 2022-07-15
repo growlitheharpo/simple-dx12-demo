@@ -5,6 +5,7 @@
 #include "gfx/core/command_queue.h"
 #include "gfx/core/window.h"
 
+#include <heart/debug/assert.h>
 #include <heart/scope_exit.h>
 
 #include <d3d12.h>
@@ -42,6 +43,8 @@ SwapChain::~SwapChain()
 
 bool SwapChain::Create(const Window& window, const CommandQueue& commandQueue, uint32 width, uint32 height, uint32 bufferCount)
 {
+	HEART_ASSERT(bufferCount <= MaxBufferedFrames);
+
 	HeartScopeGuard destroyGuard([&] {
 		Destroy();
 	});
