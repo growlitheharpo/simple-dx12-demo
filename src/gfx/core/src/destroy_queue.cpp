@@ -103,7 +103,7 @@ void DestroyQueue::DestroyCommandQueue(CommandQueue& c)
 	n->object = c.m_commandQueue;
 
 	m_frames[m_currentFrame].PushBack(n);
-	
+
 	c.m_commandQueue = nullptr;
 }
 
