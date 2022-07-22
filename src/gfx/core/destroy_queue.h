@@ -54,5 +54,6 @@ public:
 	void DestroyDescriptorHeap(DescriptorHeap& h);
 	void DestroyFence(Fence& f);
 	void DestroyResource(Resource& r);
+	void DestroyShader(Shader& s);
 	void DestroySwapChain(SwapChain& c);
 };

@@ -5,6 +5,7 @@
 #include "gfx/core/descriptor_heap.h"
 #include "gfx/core/fence.h"
 #include "gfx/core/resource.h"
+#include "gfx/core/shader.h"
 #include "gfx/core/swap_chain.h"
 
 #include <limits>
@@ -31,6 +32,9 @@ void DestroyQueue::ProcessSingleDestroy(Node& n)
 		break;
 	case DestroyQueueTag::Resource:
 		reinterpret_cast<ID3D12Resource*>(n.object)->Release();
+		break;
+	case DestroyQueueTag::Shader:
+		reinterpret_cast<ID3D10Blob*>(n.object)->Release();
 		break;
 	case DestroyQueueTag::SwapChain:
 		reinterpret_cast<IDXGISwapChain4*>(n.object)->Release();
@@ -144,6 +148,19 @@ void DestroyQueue::DestroyResource(Resource& r)
 	m_frames[m_currentFrame].PushBack(n);
 
 	r.m_resource = nullptr;
+}
+
+void DestroyQueue::DestroyShader(Shader& s)
+{
+	HeartLockGuard lock(m_listMutex);
+
+	Node* n = m_freeList.PopFront();
+	n->tag = DestroyQueueTag::Shader;
+	n->object = s.m_blob;
+
+	m_frames[m_currentFrame].PushBack(n);
+
+	s.m_blob = nullptr;
 }
 
 void DestroyQueue::DestroySwapChain(SwapChain& c)

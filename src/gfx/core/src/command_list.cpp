@@ -3,8 +3,12 @@
 #include "gfx/core/descriptor_heap.h"
 #include "gfx/core/device.h"
 #include "gfx/core/frame_ctx.h"
+#include "gfx/core/index_buffer_view.h"
+#include "gfx/core/pipeline_state_object.h"
+#include "gfx/core/root_signature.h"
 #include "gfx/core/subresource_data.h"
 #include "gfx/core/swap_chain.h"
+#include "gfx/core/vertex_buffer_view.h"
 
 #include <heart/scope_exit.h>
 
@@ -96,6 +100,36 @@ void CommandList::UpdateSubresource(Resource& destination, Resource& intermediat
 		data.firstSubresource,
 		data.numSubresources,
 		reinterpret_cast<D3D12_SUBRESOURCE_DATA*>(data.srcData));
+}
+
+void CommandList::SetPipelineState(PipelineStateObject& pso)
+{
+	m_commandList->SetPipelineState(pso.GetRawPipelineHandle());
+}
+
+void CommandList::SetRootSignature(RootSignature& rootSignature)
+{
+	m_commandList->SetGraphicsRootSignature(rootSignature.GetRawRootSignatureHandle());
+}
+
+void CommandList::SetPrimitiveTopology(uint32 todo)
+{
+	m_commandList->IASetPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY(todo));
+}
+
+void CommandList::SetVertexBuffer(VertexBufferView& view)
+{
+	m_commandList->IASetVertexBuffers(0, 1, view.GetRawViewHandle());
+}
+
+void CommandList::SetIndexBuffer(IndexBufferView& view)
+{
+	m_commandList->IASetIndexBuffer(view.GetRawViewHandle());
+}
+
+void CommandList::DrawIndexedInstanced(uint32 indexCountPerInstance, uint32 instanceCount, uint32 startIndexLocation, int32 baseVertexLocation, uint32 startInstanceLocation)
+{
+	m_commandList->DrawIndexedInstanced(indexCountPerInstance, instanceCount, startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
 
 void CommandList::Close()
