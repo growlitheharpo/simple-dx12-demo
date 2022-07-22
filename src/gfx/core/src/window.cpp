@@ -1,4 +1,4 @@
-#include "window.h"
+#include "gfx/core/window.h"
 
 #include <Windows.h> // kill me
 
@@ -59,8 +59,6 @@ bool Window::Create(WndProc wndProc, HINSTANCE instance, uint32 width, uint32 he
 		NULL,
 		instance,
 		nullptr);
-
-	DWORD x = GetLastError();
 
 	if (!hWnd)
 		return false;

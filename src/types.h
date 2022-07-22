@@ -1,6 +1,6 @@
 #pragma once
 
-#include <cstdint>
+#include <heart/types.h>
 
 typedef uint8_t uint8;
 typedef uint16_t uint16;

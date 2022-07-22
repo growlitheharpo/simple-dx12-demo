@@ -1,9 +1,10 @@
-#include "command_list.h"
+#include "gfx/core/command_list.h"
 
-#include "gfx/descriptor_heap.h"
-#include "gfx/device.h"
-#include "gfx/frame_ctx.h"
-#include "gfx/swap_chain.h"
+#include "gfx/core/descriptor_heap.h"
+#include "gfx/core/device.h"
+#include "gfx/core/frame_ctx.h"
+#include "gfx/core/subresource_data.h"
+#include "gfx/core/swap_chain.h"
 
 #include <heart/scope_exit.h>
 
@@ -30,6 +31,10 @@ bool CommandList::Create(const Device& d, const FrameCtx& fc, CommandQueueType t
 		return false;
 
 	r = m_commandList->Close();
+	if (!SUCCEEDED(r))
+		return false;
+
+	r = m_commandList->Reset(commandAllocator, nullptr);
 	if (!SUCCEEDED(r))
 		return false;
 
@@ -70,7 +75,7 @@ void CommandList::Clear(const Device& d, const DescriptorHeap& heap, const SwapC
 	m_commandList->ClearRenderTargetView(rtv, color.data_, 0, nullptr);
 }
 
-void CommandList::UpdateSubresource(Resource& destination, Resource& intermediate, UpdateSubresourceData data) const
+void CommandList::UpdateSubresource(Resource& destination, Resource& intermediate, const UpdateSubresourceData& data) const
 {
 	auto dest = destination.GetRawResourceHandle();
 	auto interm = intermediate.GetRawResourceHandle();

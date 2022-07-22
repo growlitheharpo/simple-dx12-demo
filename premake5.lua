@@ -163,6 +163,13 @@ project "google-mathfu"
 		"external/google-mathfu/include/**",
 	}
 
+project "d3dx12"
+	set_location()
+	kind "None"
+	files {
+		"external/microsoft/**",
+	}
+
 group "heart"
 	include "external/heart/heart/heart-core"
 	include "external/heart/heart/heart-stl"

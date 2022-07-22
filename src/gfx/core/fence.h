@@ -1,14 +1,14 @@
 #pragma once
 
+#include "gfx/core/fwd.h"
+#include "gfx/core/util.h"
+
 #include "types.h"
 
 #include <chrono>
 
 struct ID3D12Fence;
 typedef void* HANDLE;
-
-class CommandQueue;
-class Device;
 
 using milliseconds = std::chrono::milliseconds;
 
@@ -18,6 +18,8 @@ private:
 	ID3D12Fence* m_fence = nullptr;
 	HANDLE m_fenceEvent = nullptr;
 	uint64 m_fenceValue = 0;
+
+	ALLOW_GFX_ACCESS();
 
 public:
 	Fence() = default;

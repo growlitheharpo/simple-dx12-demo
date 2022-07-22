@@ -1,12 +1,11 @@
 #pragma once
 
-#include "gfx/util.h"
+#include "gfx/core/fwd.h"
+#include "gfx/core/util.h"
 
 #include "types.h"
 
 struct IDXGISwapChain4;
-class CommandQueue;
-class Window;
 
 class SwapChain
 {

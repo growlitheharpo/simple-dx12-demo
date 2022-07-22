@@ -1,14 +1,13 @@
 #pragma once
 
-#include "gfx/enums/command_type.h"
-#include "gfx/util.h"
+#include "gfx/core/fwd.h"
+
+#include "gfx/core/enums/command_type.h"
+#include "gfx/core/util.h"
 
 #include <initializer_list>
 
 struct ID3D12CommandQueue;
-
-class Device;
-class CommandList;
 
 class CommandQueue
 {
