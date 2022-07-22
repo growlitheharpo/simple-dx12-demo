@@ -12,8 +12,13 @@
 	prefix Device __VA_ARGS__                 \
 	prefix Fence __VA_ARGS__                  \
 	prefix FrameCtx __VA_ARGS__               \
+	prefix IndexBufferView __VA_ARGS__        \
+	prefix PipelineStateObject __VA_ARGS__    \
 	prefix Resource __VA_ARGS__               \
+	prefix RootSignature __VA_ARGS__          \
+	prefix Shader __VA_ARGS__                 \
 	prefix SwapChain __VA_ARGS__              \
+	prefix VertexBufferView __VA_ARGS__       \
 	prefix Window __VA_ARGS__
 
 #define ALL_GFX_STRUCTS(prefix, ...)        \

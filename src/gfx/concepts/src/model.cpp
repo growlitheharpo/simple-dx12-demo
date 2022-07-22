@@ -1,6 +1,8 @@
 #include "gfx/concepts/model.h"
 
+#include "gfx/core/command_list.h"
 #include "gfx/core/destroy_queue.h"
+
 #include "gfx/formats/vertex.h"
 
 #include <heart/countof.h>
@@ -33,7 +35,7 @@ Model::~Model()
 	Destroy();
 }
 
-void Model::Create(const Device& d, DestroyQueue& destroyQueue, const CommandList& cmdList)
+void Model::Create(const Device& d, DestroyQueue& destroyQueue, CommandList& cmdList)
 {
 	Resource intermediateVertexBuffer;
 	UpdateBufferResource(d,
@@ -44,11 +46,36 @@ void Model::Create(const Device& d, DestroyQueue& destroyQueue, const CommandLis
 		sizeof(s_verts[0]),
 		s_verts);
 
+	Resource intermediateIndexBuffer;
+	UpdateBufferResource(d,
+		cmdList,
+		m_indexBuffer,
+		intermediateIndexBuffer,
+		HeartCountOf(s_indices),
+		sizeof(s_indices[0]),
+		s_indices);
+
+	m_vertexView.Create(m_vertexBuffer, sizeof(s_verts), sizeof(s_verts[0]));
+	m_indexView.Create(m_indexBuffer, ResourceFormat::R16_Uint, sizeof(s_indices));
+
+	cmdList.Transition(m_vertexBuffer, ResourceState::CopyDest, ResourceState::GenericRead);
+	cmdList.Transition(m_indexBuffer, ResourceState::CopyDest, ResourceState::IndexBuffer);
+
 	destroyQueue.DestroyResource(intermediateVertexBuffer);
+	destroyQueue.DestroyResource(intermediateIndexBuffer);
 }
 
 void Model::Destroy()
 {
 	m_indexBuffer.Destroy();
 	m_vertexBuffer.Destroy();
+}
+
+void Model::Draw(CommandList& cmdList)
+{
+	cmdList.SetVertexBuffer(m_vertexView);
+	cmdList.SetIndexBuffer(m_indexView);
+
+	// Need depth buffer work first
+	// cmdList.DrawIndexedInstanced((uint32)HeartCountOf(s_indices), 1);
 }
